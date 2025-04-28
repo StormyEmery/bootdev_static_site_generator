@@ -30,6 +30,6 @@ def block_to_blocktype(text):
             return BlockType.ORDERED_LIST
     
     if all(line.strip().startswith("- ") for line in text.splitlines()):
-        return BlockType.UNORDERED_LIST
+        return BlockType.UNORDERED_LISTgit
 
     return BlockType.PARAGRAPH
