@@ -1,6 +1,6 @@
-from textnode import TextNode, TextType
 import os
 import shutil
+from utils import *
 
 def copy_files(src, dest):
     # copy files from src to dest recursively, it should clear the dest directory first and log each file copied
@@ -20,8 +20,34 @@ def copy_files(src, dest):
                 print(f"Copying {s} to {d}")
                 shutil.copy2(s, d)
 
+def generate_page(from_path, template_path, dest_path):
+    print(f"Generating page from {from_path} to {dest_path} using template {template_path}")
+    # read the source file
+    with open(from_path, 'r') as f:
+        source = f.read()
+
+    # read the template file
+    with open(template_path, 'r') as f:
+        template = f.read()
+    
+    title = extract_title(source)
+    html = markdown_to_html_node(source).to_html()
+
+    template = template.replace("{{ Title }}", title)
+    template = template.replace("{{ Content }}", html)
+
+    # write the generated file to the destination path, creating the directory if it doesn't exist
+    dest_dir = os.path.dirname(dest_path)
+    if not os.path.exists(dest_dir):
+        os.makedirs(dest_dir)
+        
+    with open(dest_path, 'w') as f:
+        f.write(template)
+
+
 def main():
     copy_files("static", "public")
+    generate_page("content/index.md", "template.html", "public/index.html")
     
 
 if __name__ == "__main__":

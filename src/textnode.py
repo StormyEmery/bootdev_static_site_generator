@@ -37,6 +37,6 @@ class TextNode:
         elif self.text_type == TextType.LINK:
             return LeafNode(tag="a", value=self.text, props={"href": self.url})
         elif self.text_type == TextType.IMAGE:
-            return LeafNode(tag="img", value=None, props={"src": self.url, "alt": self.text})
+            return LeafNode(tag="img", value="", props={"src": self.url, "alt": self.text})
         else:
             raise ValueError("Invalid text type")
