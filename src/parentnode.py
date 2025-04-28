@@ -10,6 +10,7 @@ class ParentNode(HTMLNode):
         if not self.children:
             raise ValueError("ParentNode must have children")
         
+
         children_html = "".join(child.to_html() for child in self.children)
         props_str = self.props_to_html()
         if props_str:
