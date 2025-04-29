@@ -44,10 +44,22 @@ def generate_page(from_path, template_path, dest_path):
     with open(dest_path, 'w') as f:
         f.write(template)
 
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    # Generate pages recursively from dir_path_content to dest_dir_path using template_path
+    for item in os.listdir(dir_path_content):
+        s = os.path.join(dir_path_content, item)
+        d = os.path.join(dest_dir_path, item.replace(".md", ".html"))  # Ensure .md files are converted to .html
+        if os.path.isdir(s):
+            # Recursively process subdirectories
+            generate_pages_recursive(s, template_path, d)
+        elif s.endswith(".md"):  # Only process Markdown files
+            print(f"Generating page from {s} to {d} using template {template_path}")
+            generate_page(s, template_path, d)
 
 def main():
     copy_files("static", "public")
-    generate_page("content/index.md", "template.html", "public/index.html")
+    # generate_page("content/index.md", "template.html", "public/index.html")
+    generate_pages_recursive("content", "template.html", "public")
     
 
 if __name__ == "__main__":
