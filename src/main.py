@@ -1,5 +1,6 @@
 import os
 import shutil
+import sys
 from utils import *
 
 def copy_files(src, dest):
@@ -20,7 +21,7 @@ def copy_files(src, dest):
                 print(f"Copying {s} to {d}")
                 shutil.copy2(s, d)
 
-def generate_page(from_path, template_path, dest_path):
+def generate_page(basepath, from_path, template_path, dest_path):
     print(f"Generating page from {from_path} to {dest_path} using template {template_path}")
     # read the source file
     with open(from_path, 'r') as f:
@@ -36,6 +37,9 @@ def generate_page(from_path, template_path, dest_path):
     template = template.replace("{{ Title }}", title)
     template = template.replace("{{ Content }}", html)
 
+    template = template.replace('href="/', f'href="{basepath}')
+    template = template.replace('src="/', f'src="{basepath}')
+
     # write the generated file to the destination path, creating the directory if it doesn't exist
     dest_dir = os.path.dirname(dest_path)
     if not os.path.exists(dest_dir):
@@ -44,23 +48,27 @@ def generate_page(from_path, template_path, dest_path):
     with open(dest_path, 'w') as f:
         f.write(template)
 
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(basepath, dir_path_content, template_path, dest_dir_path):
     # Generate pages recursively from dir_path_content to dest_dir_path using template_path
     for item in os.listdir(dir_path_content):
         s = os.path.join(dir_path_content, item)
         d = os.path.join(dest_dir_path, item.replace(".md", ".html"))  # Ensure .md files are converted to .html
         if os.path.isdir(s):
             # Recursively process subdirectories
-            generate_pages_recursive(s, template_path, d)
+            generate_pages_recursive(basepath, s, template_path, d)
         elif s.endswith(".md"):  # Only process Markdown files
             print(f"Generating page from {s} to {d} using template {template_path}")
-            generate_page(s, template_path, d)
+            generate_page(basepath, s, template_path, d)
 
 def main():
+    # set basepath to argv[1] if provided, else '/'
+    basepath = sys.argv[1] if len(sys.argv) > 1 else "/"
+
     copy_files("static", "public")
-    # generate_page("content/index.md", "template.html", "public/index.html")
-    generate_pages_recursive("content", "template.html", "public")
+    generate_pages_recursive(basepath, "content", "template.html", "public")
     
+
+
 
 if __name__ == "__main__":
     main()
